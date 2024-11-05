@@ -1,26 +1,47 @@
-import random 
 import streamlit as st
+import random
 
-def guessing_game():
-    low, high - 1, 100
-    secret_number - random.randint(low, high)
-    attempt = 0
-    st.writer-(f"Welcome to the Number Guessing Game! I'm thinking of a number between {low} and {high}.")
+# Function to start or reset the game
+def start_game():
+    # Initialize session state variables if not already set
+    if 'number_to_guess' not in st.session_state:
+        st.session_state.number_to_guess = random.randint(1, 100)
+        st.session_state.attempts = 0
+        st.session_state.message = "Welcome to the Guessing Game! Guess a number between 1 and 100."
+        st.session_state.game_over = False
 
-    While True:
-         try:
-            guess - int(input{"Enter your guess:"})
-            attempts +=1
-         except ValueError:s
-            st.wite("Please enter a valid integer.")
-            continue
+# Function to handle the user's guess
+def check_guess(guess):
+    # Increase the number of attempts
+    st.session_state.attempts += 1
+    
+    # Check if the guess is correct, too high, or too low
+    if guess < st.session_state.number_to_guess:
+        st.session_state.message = "Too low! Try again."
+    elif guess > st.session_state.number_to_guess:
+        st.session_state.message = "Too high! Try again."
+    else:
+        st.session_state.message = f"Congratulations! You guessed the correct number {st.session_state.number_to_guess} in {st.session_state.attempts} attempts."
+        st.session_state.game_over = True
 
-         if guess < secret_number:
-            st.write("Too low! Try again.")
-         elif guess > secret_number :
-            st.write("Too high! Try again.")
-         else:
-            st.write(f"Congratulations! you've guessed the correct number {secret_number} in {attempts} attempts.")
-            break
+# Start the game when the script is run
+start_game()
 
-guessing_game()
+# Input box for the user's guess
+if not st.session_state.game_over:
+    guess = st.number_input("Enter your guess:", min_value=1, max_value=100, step=1)
+    
+    # Button to submit the guess
+    if st.button("Submit Guess"):
+        if guess:
+            check_guess(guess)
+
+# Display the feedback message
+st.write(st.session_state.message)
+
+# Button to reset the game if the user guesses correctly or wants to try again
+if st.session_state.game_over:
+    if st.button("Play Again"):
+        st.session_state.clear()  # Clear the session state to start a new game
+        start_game()
+
